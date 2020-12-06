@@ -28,3 +28,26 @@ exports.SignUp = async (req, res) => {
         return res.status(500).json({ msg: error.message });
     }
 };
+
+exports.SignIn = async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(422).json({ msg: 'Missing info' });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (user) {
+            const match = await bcrypt.compare(password, user.password);
+            console.log(match);
+            if (match) {
+                return res.json({ msg: 'Authenticated' });
+            }
+            return res.status(401).json({ msg: 'Unauthorized' });
+        }
+        return res.status(404).json({ msg: "The user doesn't exists" });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: error.message });
+    }
+};
