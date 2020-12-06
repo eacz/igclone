@@ -39,7 +39,6 @@ exports.SignIn = async (req, res) => {
         const user = await User.findOne({ email });
         if (user) {
             const match = await bcrypt.compare(password, user.password);
-            console.log(match);
             if (match) {
                 return res.json({ msg: 'Authenticated' });
             }
