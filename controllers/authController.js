@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 exports.SignUp = async (req, res) => {
     const { name, email, password } = req.body;
@@ -40,7 +41,8 @@ exports.SignIn = async (req, res) => {
         if (user) {
             const match = await bcrypt.compare(password, user.password);
             if (match) {
-                return res.json({ msg: 'Authenticated' });
+                const token = jwt.sign({_id:user._id}, process.env.SECRET_KEY, {expiresIn: 14400});
+                return res.json({ msg: 'Authenticated', token });
             }
             return res.status(401).json({ msg: 'Unauthorized' });
         }
