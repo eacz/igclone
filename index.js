@@ -1,6 +1,5 @@
 const express = require('express');
-const app = express();
-app.use(express.json({ extended: true }));
+
 const mongoose = require('mongoose');
 require('dotenv').config({ path: 'vars.env' });
 const port = process.env.PORT || 4000;
@@ -17,9 +16,14 @@ mongoose.connection.on('error', () => {
     process.exit();
 });
 
+//initialize app
+const app = express();
+app.use(express.json({ extended: true }));
 //routes
 const authRouter = require('./routes/auth');
+const postRouter = require('./routes/post');
 app.use('/auth', authRouter);
+app.use('/post', postRouter);
 
 app.listen(port, () => {
     console.log(`runninggg on ${port}`);
