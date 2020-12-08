@@ -12,7 +12,7 @@ exports.SignUp = async (req, res) => {
     try {
         let user = await User.findOne({ email: email });
         if (user) {
-            return res.status(401).json({ error: 'User already exists' });
+            return res.status(401).json({ msg: 'User already exists' });
         }
         user = new User({
             email,
