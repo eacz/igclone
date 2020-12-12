@@ -3,13 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.SignUp = async (req, res) => {
-<<<<<<< HEAD
     const { name, email, password,photo, username } = req.body;
     if (!email || !name || !password || !username) {
-=======
-    const { name, email, password } = req.body;
-    if (!email || !name || !password) {
->>>>>>> 6e3053212844809575685e20c0a3a46dbddaec8c
         return res
             .status(422)
             .json({ error: 'You have to fill all the fields' });
@@ -22,11 +17,8 @@ exports.SignUp = async (req, res) => {
         user = new User({
             email,
             name,
-<<<<<<< HEAD
             photo,
             username
-=======
->>>>>>> 6e3053212844809575685e20c0a3a46dbddaec8c
         });
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
@@ -52,12 +44,8 @@ exports.SignIn = async (req, res) => {
             const match = await bcrypt.compare(password, user.password);
             if (match) {
                 const token = jwt.sign({_id:user._id}, process.env.SECRET_KEY, {expiresIn: 14400});
-<<<<<<< HEAD
                 user.password = undefined;
                 return res.json({ msg: 'Successfully Login', token, user});
-=======
-                return res.json({ msg: 'Authenticated', token });
->>>>>>> 6e3053212844809575685e20c0a3a46dbddaec8c
             }
             return res.status(401).json({ msg: 'Unauthorized' });
         }
