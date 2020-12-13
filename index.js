@@ -24,8 +24,10 @@ app.use(cors())
 //routes
 const authRouter = require('./routes/auth');
 const postRouter = require('./routes/post');
+const userRouter = require('./routes/user')
 app.use('/auth', authRouter);
 app.use('/post', postRouter);
+app.use('/user', userRouter);
 
 app.listen(port, () => {
     console.log(`runninggg on ${port}`);
