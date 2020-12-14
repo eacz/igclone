@@ -25,7 +25,7 @@ const userSchema = mongoose.Schema({
     },
     description: {
         type: String,
-        defaut: '',
+        default: '',
     },
     followers: {
         type: [mongoose.Types.ObjectId],
