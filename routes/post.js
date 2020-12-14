@@ -6,6 +6,7 @@ const verifyToken = require('../middlewares/authToken');
 router.post('/', verifyToken, postController.createPost);
 router.get('/all', verifyToken, postController.getAllPosts);
 router.get('/user', verifyToken, postController.getUserPosts);
-router.get('/:postID', postController.getOnePost)
+router.get('/following', verifyToken, postController.getFollowingPosts);
+router.get('/:postID', postController.getOnePost);
 
 module.exports = router;
