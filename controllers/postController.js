@@ -80,3 +80,4 @@ module.exports.getFollowingPosts = async (req, res) => {
         return res.json({ msg: error.message });
     }
 };
+

@@ -50,8 +50,7 @@ module.exports.FollowUnfollow = async (req, res) => {
             user.following.includes(userID)
                 ? null
                 : (user.following.push(userID),
-                  userToInteract.followers.push(user._id),
-                  console.log('here'));
+                  userToInteract.followers.push(user._id))
         } else {
             user.following = user.following.filter((userF) =>
                 userF.toString() === userID ? null : userF
@@ -70,3 +69,16 @@ module.exports.FollowUnfollow = async (req, res) => {
         return res.json({ msg: error.message });
     }
 };
+
+module.exports.getListDetails = async (req,res) => {
+    const {usersIDS} = req.body
+    console.log(req);
+    try {
+        const users = await User.find({_id: usersIDS}).select('username photo')
+        return res.json({users});
+    } catch (error) {
+        console.log(error);
+        res.status(500)
+        return res.json({msg: error.message})
+    }
+}
