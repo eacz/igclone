@@ -44,17 +44,24 @@ module.exports.FollowUnfollow = async (req, res) => {
     const { _id } = req.user;
     const { userID, follow } = req.body;
     try {
-        const user = await User.findById(_id);
+        const userToInteract = await User.findById(userID); //user to follow/unfollow
+        const user = await User.findById(_id); //user that follows/unfollows
         if (follow) {
             user.following.includes(userID)
                 ? null
-                : user.following.push(userID);
+                : (user.following.push(userID),
+                  userToInteract.followers.push(user._id),
+                  console.log('here'));
         } else {
             user.following = user.following.filter((userF) =>
                 userF.toString() === userID ? null : userF
             );
+            userToInteract.followers = userToInteract.followers.filter(
+                (userF) => (userF.toString() === user._id.toString() ? null : userF)
+            );
         }
         await user.save();
+        await userToInteract.save();
         user.password = undefined;
         return res.json({ user });
     } catch (error) {
