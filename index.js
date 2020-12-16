@@ -29,6 +29,6 @@ app.use('/auth', authRouter);
 app.use('/post', postRouter);
 app.use('/user', userRouter);
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`runninggg on ${port}`);
 });
