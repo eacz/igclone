@@ -9,7 +9,7 @@ module.exports.getUserWithPosts = async (req, res) => {
         if (!user) {
             throw new Error("This user doesn't exists");
         }
-        const posts = await Post.find({ postedBy: user._id });
+        const posts = await Post.find({ postedBy: user._id }).sort('-created')
         return res.json({ user, posts });
     } catch (error) {
         console.log(error);
