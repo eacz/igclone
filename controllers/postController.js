@@ -81,3 +81,21 @@ module.exports.getFollowingPosts = async (req, res) => {
     }
 };
 
+module.exports.likeDislike = async (req, res) => {
+    const user = req.user;
+    const { postID } = req.params;
+    try {
+        const post = await Post.findById(postID);
+        post.likes.includes(user._id)
+            ? (post.likes = post.likes.filter((id) =>
+                  id.toString() === user._id.toString() ? null : id
+              ))
+            : post.likes.push(user._id);
+        await post.save();
+        return res.json({ msg: 'Success', post });
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+        return res.json({ msg: error.message });
+    }
+};
