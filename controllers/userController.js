@@ -1,3 +1,4 @@
+const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 const User = require('../models/User');
 
@@ -9,7 +10,12 @@ module.exports.getUserWithPosts = async (req, res) => {
         if (!user) {
             throw new Error("This user doesn't exists");
         }
-        const posts = await Post.find({ postedBy: user._id }).sort('-created')
+        const posts = await Post.find({ postedBy: user._id }).populate({
+            path: 'comments',
+            select: 'postedBy comment',
+            model: Comment,
+            populate: { path: 'postedBy', select: 'username photo' },
+        }).sort('-created')
         return res.json({ user, posts });
     } catch (error) {
         console.log(error);

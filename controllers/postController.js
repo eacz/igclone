@@ -1,3 +1,4 @@
+const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 
 module.exports.createPost = async (req, res) => {
@@ -25,7 +26,15 @@ module.exports.createPost = async (req, res) => {
 
 module.exports.getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find({}).populate('postedBy', '-password');
+        const posts = await Post.find({})
+            .populate('postedBy', '-password')
+            .populate({
+                path: 'comments',
+                select: 'postedBy comment',
+                model: Comment,
+                populate: { path: 'postedBy', select: 'username photo' },
+                limit: 2
+            });
         return res.json({ posts });
     } catch (error) {
         res.status(500);
@@ -36,9 +45,16 @@ module.exports.getAllPosts = async (req, res) => {
 
 module.exports.getUserPosts = async (req, res) => {
     const user = req.user;
-    console.log(user);
     try {
-        const posts = await Post.find({ postedBy: user }).sort('-created');
+        const posts = await Post.find({ postedBy: user })
+            .populate({
+                path: 'comments',
+                select: 'postedBy comment',
+                model: Comment,
+                populate: { path: 'postedBy', select: 'username photo' },
+                limit: 2
+            })
+            .sort('-created');
         return res.json({ posts });
     } catch (error) {
         res.status(500);
@@ -50,10 +66,15 @@ module.exports.getUserPosts = async (req, res) => {
 module.exports.getOnePost = async (req, res) => {
     try {
         const { postID } = req.params;
-        const post = await Post.findById(postID).populate(
-            'postedBy',
-            'username photo'
-        );
+        const post = await Post.findById(postID)
+            .populate({ path: 'postedBy', select: 'username photo' })
+            .populate({
+                path: 'comments',
+                select: 'postedBy comment',
+                model: Comment,
+                populate: { path: 'postedBy', select: 'username photo' },
+                limit: 2
+            });
         if (post) {
             return res.json({ post });
         }
@@ -72,7 +93,14 @@ module.exports.getFollowingPosts = async (req, res) => {
         const posts = await Post.find({ postedBy: following })
             .sort('-created')
             .limit(50)
-            .populate('postedBy', 'photo username');
+            .populate('postedBy', 'photo username')
+            .populate({
+                path: 'comments',
+                select: 'postedBy comment',
+                model: Comment,
+                populate: { path: 'postedBy', select: 'username photo' },
+                limit: 2,
+            });
         return res.json({ posts });
     } catch (error) {
         res.status(404);
