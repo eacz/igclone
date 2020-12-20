@@ -1,8 +1,10 @@
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
+const User = require('../models/User');
 
 exports.postComment = async (req, res) => {
     const user = req.user;
+    console.log(user);
     const { postID, comment } = req.body;
 
     if (!comment || !postID) {
@@ -27,7 +29,8 @@ exports.postComment = async (req, res) => {
         await newComment.save();
         post.comments.push(newComment._id);
         await post.save();
-        return res.json({ msg: 'Comment added successfully', newComment });
+        const userData = {_id: user._id, username: user.username, photo: user.photo}
+        return res.json({ msg: 'Comment added successfully', newComment, userData });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ msg: error.message });
