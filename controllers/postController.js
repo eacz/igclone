@@ -1,7 +1,7 @@
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 
-module.exports.createPost = async (req, res) => {
+exports.createPost = async (req, res) => {
     const { title, body, photo } = req.body;
     if (!title || !body || !photo) {
         console.log(photo);
@@ -24,26 +24,7 @@ module.exports.createPost = async (req, res) => {
     }
 };
 
-module.exports.getAllPosts = async (req, res) => {
-    try {
-        const posts = await Post.find({})
-            .populate('postedBy', '-password')
-            .populate({
-                path: 'comments',
-                select: 'postedBy comment',
-                model: Comment,
-                populate: { path: 'postedBy', select: 'username photo' },
-                limit: 2
-            });
-        return res.json({ posts });
-    } catch (error) {
-        res.status(500);
-        console.log(error);
-        return res.json({ msg: error.message });
-    }
-};
-
-module.exports.getUserPosts = async (req, res) => {
+exports.getUserPosts = async (req, res) => {
     const user = req.user;
     try {
         const posts = await Post.find({ postedBy: user })
@@ -63,7 +44,7 @@ module.exports.getUserPosts = async (req, res) => {
     }
 };
 
-module.exports.getOnePost = async (req, res) => {
+exports.getOnePost = async (req, res) => {
     try {
         const { postID } = req.params;
         const post = await Post.findById(postID)
@@ -86,7 +67,7 @@ module.exports.getOnePost = async (req, res) => {
     }
 };
 
-module.exports.getFollowingPosts = async (req, res) => {
+exports.getFollowingPosts = async (req, res) => {
     const user = req.user;
     const { following } = user;
     try {
@@ -109,7 +90,7 @@ module.exports.getFollowingPosts = async (req, res) => {
     }
 };
 
-module.exports.likeDislike = async (req, res) => {
+exports.likeDislike = async (req, res) => {
     const user = req.user;
     const { postID } = req.params;
     try {
@@ -127,3 +108,24 @@ module.exports.likeDislike = async (req, res) => {
         return res.json({ msg: error.message });
     }
 };
+
+exports.deletePost = async (req,res) => {
+    const user = req.user
+    const {postID} = req.params;
+
+    try {
+        const post = await Post.findById(postID);
+        if(!post){
+            return res.status(401).json({msg: "This post doesn't exists or have been already deleted."})
+        }
+        if(post.postedBy.toString() !== user._id.toString()) {
+            return res.status(401).json({msg: "You're not allowed to delete this post"})
+        }
+        await Comment.deleteMany({post: post._id})
+        post.delete()
+        return res.json({msg: 'Post deleted successfully'})
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({msg: error.message})
+    }
+}

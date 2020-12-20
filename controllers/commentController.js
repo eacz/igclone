@@ -1,6 +1,5 @@
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
-const User = require('../models/User');
 
 exports.postComment = async (req, res) => {
     const user = req.user;
@@ -57,10 +56,8 @@ exports.editComment = async (req, res) => {
 
 exports.getCommentsByPost = async (req, res) => {
     const { postID } = req.params;
-    console.log(postID);
-
     try {
-        const comments = await Comment.find({ post: postID }).populate('postedBy', 'photo username')
+        const comments = await Comment.find({ post: postID }).populate('postedBy', 'photo username').sort('-created')
 
         return res.json({ comments });
     } catch (error) {
