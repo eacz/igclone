@@ -88,3 +88,15 @@ module.exports.getListDetails = async (req,res) => {
         return res.json({msg: error.message})
     }
 }
+
+
+module.exports.searchUsers = async (req,res) => {
+    const {search} = req.params;
+    try {
+        const users  = await User.find({username: search});
+        return res.json({users})
+    } catch (error) {
+        res.status(500);
+        return res.json({msg: error.message})
+    }
+}

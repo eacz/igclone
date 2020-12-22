@@ -5,6 +5,7 @@ const verifyToken = require('../middlewares/authToken');
 
 router.post('/follow', verifyToken, userController.FollowUnfollow);
 router.put('/', verifyToken, userController.updateUserInfo)
+router.get('/search/:search', verifyToken, userController.searchUsers)
 router.post('/list_details', userController.getListDetails)
 router.get('/:userID', userController.getUserWithPosts)
 
