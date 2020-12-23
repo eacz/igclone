@@ -65,3 +65,22 @@ exports.getCommentsByPost = async (req, res) => {
         return res.status(500).json({ msg: error.message });
     }
 };
+
+exports.deleteComment = async (req, res) => {
+    const user = req.user ;
+    const {commentID} = req.params;
+    try {
+        const comment = await Comment.findById(commentID);
+        if(comment.postedBy.toString() !== user._id.toString()){
+            return res.status(401).json({msg: "You're not allowed to delete this comment"});
+        }
+        const post = await Post.findById(comment.post)
+        comment.delete();
+        post.comments = post.comments.filter(comment => comment.toString() === commentID.toString() ? null : comment)
+        await post.save();
+        return res.json({msg: 'Comment deleted successfully'})
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({msg: error.message})
+    }
+}
