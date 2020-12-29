@@ -36,6 +36,11 @@ const userSchema = mongoose.Schema({
         type: [mongoose.Types.ObjectId],
         ref: 'User',
         default: [],
+    },
+    postsSaved: {
+        type: [mongoose.Types.ObjectId],
+        ref: 'Post',
+        default: []
     }
 });
 

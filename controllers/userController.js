@@ -99,19 +99,58 @@ module.exports.searchUsers = async (req, res) => {
     try {
         const users = await User.find({}).select('username photo name');
         const selectedUsers = [];
-        
+
         users.forEach((user) => {
-            if(user.username.toLowerCase().indexOf(search.toLowerCase()) !== -1){
-                selectedUsers.push(user)
+            if (
+                user.username.toLowerCase().indexOf(search.toLowerCase()) !== -1
+            ) {
+                selectedUsers.push(user);
+            } else if (
+                user.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+            ) {
+                selectedUsers.push(user);
             }
-            else if(user.name.toLowerCase().indexOf(search.toLowerCase()) !== -1){
-                selectedUsers.push(user)
-            }
-                
         });
         return res.json({ users: selectedUsers });
     } catch (error) {
         res.status(500);
         return res.json({ msg: error.message });
+    }
+};
+
+module.exports.SavedUnsavedPost = async (req, res) => {
+    console.log(req.user);
+    const { _id } = req.user;
+    const { postID, isSaved } = req.body;
+
+    try {
+        const user = await User.findById(_id);
+        if (isSaved) {
+            user.postsSaved = user.postsSaved.filter((post) =>
+                post.toString() === postID ? null : post
+            );
+            await user.save();
+        } else {
+            user.postsSaved.includes(postID)
+                ? null
+                : user.postsSaved.push(postID),
+                await user.save();
+        }
+        return res.json({ msg: "user's posts saved updated" });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: error.message });
+    }
+};
+
+module.exports.getPostsSaved = async (req, res) => {
+    const { postsSaved } = req.user;
+
+    try {
+        const posts = await Post.find({ _id: postsSaved }).select('photo')
+        return res.json({ posts });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: error.message });
     }
 };
