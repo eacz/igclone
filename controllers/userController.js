@@ -104,7 +104,7 @@ module.exports.searchUsers = async (req, res) => {
             if(user.username.toLowerCase().indexOf(search.toLowerCase()) !== -1){
                 selectedUsers.push(user)
             }
-            if(user.name.toLowerCase().indexOf(search.toLowerCase()) !== -1){
+            else if(user.name.toLowerCase().indexOf(search.toLowerCase()) !== -1){
                 selectedUsers.push(user)
             }
                 
