@@ -3,8 +3,7 @@ const Post = require('../models/Post');
 
 exports.createPost = async (req, res) => {
     const { title, body, photo } = req.body;
-    if (!title || !body || !photo) {
-        console.log(photo);
+    if (!photo) {
         return res.status(422).json({ msg: 'Missing information' });
     }
     const created = new Date(Date.now());
@@ -33,12 +32,11 @@ exports.getUserPosts = async (req, res) => {
                 select: 'postedBy comment',
                 model: Comment,
                 populate: { path: 'postedBy', select: 'username photo' },
-                limit: 2
+                limit: 2,
             })
             .sort('-created');
         return res.json({ posts });
     } catch (error) {
-        res.status(500);
         console.log(error);
         return res.status(500).json({ msg: error.message });
     }
@@ -54,16 +52,15 @@ exports.getOnePost = async (req, res) => {
                 select: 'postedBy comment',
                 model: Comment,
                 populate: { path: 'postedBy', select: 'username photo' },
-                limit: 2
+                limit: 2,
             });
         if (post) {
             return res.json({ post });
         }
         throw new Error("The post doesn't exists or have been deleted");
     } catch (error) {
-        res.status(500);
         console.log(error);
-        return res.json({ msg: error.message });
+        return res.status(500).json({ msg: error.message });
     }
 };
 
@@ -84,9 +81,8 @@ exports.getFollowingPosts = async (req, res) => {
             });
         return res.json({ posts });
     } catch (error) {
-        res.status(404);
         console.log(error);
-        return res.json({ msg: error.message });
+        return res.status(500).json({ msg: error.message });
     }
 };
 
@@ -104,28 +100,31 @@ exports.likeDislike = async (req, res) => {
         return res.json({ msg: 'Success', post });
     } catch (error) {
         console.log(error);
-        res.status(500);
-        return res.json({ msg: error.message });
+        return res.status(500).json({ msg: error.message });
     }
 };
 
-exports.deletePost = async (req,res) => {
-    const user = req.user
-    const {postID} = req.params;
+exports.deletePost = async (req, res) => {
+    const user = req.user;
+    const { postID } = req.params;
 
     try {
         const post = await Post.findById(postID);
-        if(!post){
-            return res.status(401).json({msg: "This post doesn't exists or have been already deleted."})
+        if (!post) {
+            return res.status(401).json({
+                msg: "This post doesn't exists or have been already deleted.",
+            });
         }
-        if(post.postedBy.toString() !== user._id.toString()) {
-            return res.status(401).json({msg: "You're not allowed to delete this post"})
+        if (post.postedBy.toString() !== user._id.toString()) {
+            return res
+                .status(401)
+                .json({ msg: "You're not allowed to delete this post" });
         }
-        await Comment.deleteMany({post: post._id})
-        post.delete()
-        return res.json({msg: 'Post deleted successfully'})
+        await Comment.deleteMany({ post: post._id });
+        post.delete();
+        return res.json({ msg: 'Post deleted successfully' });
     } catch (error) {
         console.log(error);
-        return res.status(500).json({msg: error.message})
+        return res.status(500).json({ msg: error.message });
     }
-}
+};

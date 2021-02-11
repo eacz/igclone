@@ -42,9 +42,8 @@ module.exports.updateUserInfo = async (req, res) => {
         user.password = undefined;
         return res.json({ msg: 'User updated successfully', user });
     } catch (error) {
-        res.status(500);
         console.log(error);
-        return res.json({ msg: error.message });
+        return res.status(500).json({ msg: error.message });
     }
 };
 
@@ -74,14 +73,12 @@ module.exports.FollowUnfollow = async (req, res) => {
         return res.json({ user });
     } catch (error) {
         console.log(error);
-        res.status(500);
-        return res.json({ msg: error.message });
+        return res.status(500).json({ msg: error.message });
     }
 };
 
 module.exports.getListDetails = async (req, res) => {
     const { usersIDS } = req.body;
-    console.log(req);
     try {
         const users = await User.find({ _id: usersIDS }).select(
             'username photo'
@@ -89,8 +86,7 @@ module.exports.getListDetails = async (req, res) => {
         return res.json({ users });
     } catch (error) {
         console.log(error);
-        res.status(500);
-        return res.json({ msg: error.message });
+        return res.status(500).json({ msg: error.message });
     }
 };
 
@@ -117,7 +113,7 @@ module.exports.searchUsers = async (req, res) => {
             return !duplicate;
         });
 
-        return res.json({ users: users });
+        return res.json({ users });
     } catch (error) {
         res.status(500);
         return res.json({ msg: error.message });
@@ -125,7 +121,6 @@ module.exports.searchUsers = async (req, res) => {
 };
 
 module.exports.SavedUnsavedPost = async (req, res) => {
-    console.log(req.user);
     const { _id } = req.user;
     const { postID, isSaved } = req.body;
 
