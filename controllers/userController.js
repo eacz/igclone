@@ -96,22 +96,28 @@ module.exports.getListDetails = async (req, res) => {
 
 module.exports.searchUsers = async (req, res) => {
     const { search } = req.params;
+    if (!search) {
+        return res.status(401).json({ msg: 'No search' });
+    }
+    const regex = new RegExp(search, 'i');
     try {
-        const users = await User.find({}).select('username photo name');
-        const selectedUsers = [];
+        const usersByName = await User.find({ name: regex }).select(
+            'username photo name' //photo name
+        );
+        const usersByUsername = await User.find({ username: regex }).select(
+            'username photo name'
+        );
+        const allMatches = [...usersByName, ...usersByUsername];
 
-        users.forEach((user) => {
-            if (
-                user.username.toLowerCase().indexOf(search.toLowerCase()) !== -1
-            ) {
-                selectedUsers.push(user);
-            } else if (
-                user.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
-            ) {
-                selectedUsers.push(user);
-            }
+        const seen = new Set();
+
+        const users = allMatches.filter((user) => {
+            const duplicate = seen.has(user.username);
+            seen.add(user.username);
+            return !duplicate;
         });
-        return res.json({ users: selectedUsers });
+
+        return res.json({ users: users });
     } catch (error) {
         res.status(500);
         return res.json({ msg: error.message });
@@ -147,7 +153,7 @@ module.exports.getPostsSaved = async (req, res) => {
     const { postsSaved } = req.user;
 
     try {
-        const posts = await Post.find({ _id: postsSaved }).select('photo')
+        const posts = await Post.find({ _id: postsSaved }).select('photo');
         return res.json({ posts });
     } catch (error) {
         console.log(error);
